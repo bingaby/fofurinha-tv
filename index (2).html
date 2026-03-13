@@ -1,0 +1,754 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FofurinaTV – Animais & Bebês</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Baloo+2:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --verde:#2ecc71;--verde-escuro:#27ae60;--rosa:#ff6b9d;--rosa-claro:#ffe0ec;
+  --amarelo:#ffd32a;--azul:#48dbfb;--bg:#fff9f5;--card-bg:#ffffff;
+  --text:#2d2d2d;--muted:#888;--radius:18px;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+
+/* TOPBAR */
+.topbar{background:#fff;padding:12px 20px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;border-bottom:2px solid #ffe8f0;box-shadow:0 2px 12px rgba(255,107,157,0.08);gap:12px;}
+.logo{font-family:'Baloo 2',cursive;font-size:24px;font-weight:800;color:var(--rosa);line-height:1;white-space:nowrap;}
+.logo span{color:var(--verde);}
+.search-bar{display:flex;align-items:center;background:#fdf0f5;border:1.5px solid #ffd0e0;border-radius:30px;padding:8px 16px;gap:6px;flex:1;max-width:600px;}
+.search-bar input{border:none;background:transparent;font-family:'Nunito',sans-serif;font-size:14px;color:var(--text);width:100%;outline:none;}
+.search-bar input::placeholder{color:#ccc;}
+.topbar-right{display:flex;align-items:center;gap:8px;}
+.notif-btn{width:38px;height:38px;background:var(--rosa-claro);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:17px;cursor:pointer;flex-shrink:0;border:none;}
+.admin-btn{background:var(--amarelo);border:none;border-radius:20px;padding:8px 16px;font-family:'Nunito',sans-serif;font-weight:800;font-size:13px;color:#5a3e00;cursor:pointer;white-space:nowrap;}
+
+/* CATS */
+.cats-wrap{padding:12px 20px 10px;background:#fff;border-bottom:1px solid #f5e6ec;}
+.cats{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;padding-bottom:4px;}
+.cats::-webkit-scrollbar{display:none;}
+.cat{white-space:nowrap;padding:7px 18px;border-radius:30px;font-size:13px;font-weight:700;cursor:pointer;border:2px solid transparent;transition:all 0.2s;flex-shrink:0;}
+.cat.all{background:var(--rosa);color:#fff;}
+.cat.animais{background:#e8f8f0;color:var(--verde-escuro);border-color:#a8e6c3;}
+.cat.bebes{background:#fff0f6;color:var(--rosa);border-color:#ffd0e4;}
+.cat.pets{background:#fff8e1;color:#f59f00;border-color:#ffe066;}
+.cat.fofura{background:#e8f4fd;color:#0984e3;border-color:#aed6f1;}
+.cat.viral{background:#fdebd0;color:#e67e22;border-color:#f0b27a;}
+
+/* LAYOUT */
+.page-body{display:flex;max-width:1440px;margin:0 auto;width:100%;}
+.sidebar{display:none;width:220px;flex-shrink:0;padding:24px 16px;border-right:1px solid #f0e0e8;background:#fff;min-height:calc(100vh - 110px);}
+.sidebar-title{font-size:11px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--rosa);margin-bottom:14px;margin-top:8px;}
+.sidebar-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:12px;font-size:14px;font-weight:700;color:#555;cursor:pointer;margin-bottom:4px;transition:all 0.15s;}
+.sidebar-item:hover{background:#fff0f6;color:var(--rosa);}
+.sidebar-item.active{background:var(--rosa-claro);color:var(--rosa);}
+.sidebar-icon{font-size:18px;width:24px;text-align:center;}
+.sidebar-divider{height:1px;background:#f0e0e8;margin:14px 0;}
+.trend-item{padding:8px 0;border-bottom:1px solid #fdeaf0;}
+.trend-label{font-size:10px;color:var(--rosa);font-weight:800;text-transform:uppercase;letter-spacing:1px;margin-bottom:2px;}
+.trend-text{font-size:12px;font-weight:700;color:#444;}
+.trend-views{font-size:11px;color:var(--muted);}
+.content{flex:1;min-width:0;padding:20px 24px 60px;}
+
+/* FEATURED */
+.featured-label{font-size:11px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--rosa);margin-bottom:10px;display:flex;align-items:center;gap:6px;}
+.featured-label::before{content:'';width:18px;height:3px;background:var(--rosa);border-radius:2px;display:inline-block;}
+.featured-card{background:var(--card-bg);border-radius:var(--radius);overflow:hidden;box-shadow:0 8px 30px rgba(255,107,157,0.12);border:1.5px solid #fde8f0;cursor:pointer;transition:transform 0.2s;margin-bottom:20px;}
+.featured-card:hover{transform:translateY(-2px);}
+.featured-thumb{width:100%;aspect-ratio:16/9;position:relative;overflow:hidden;background:#1a1a1a;}
+.featured-thumb img{width:100%;height:100%;object-fit:cover;display:block;}
+.play-overlay{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.25);transition:background 0.2s;cursor:pointer;}
+.play-overlay:hover{background:rgba(0,0,0,0.1);}
+.play-circle{width:64px;height:64px;background:var(--rosa);border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 20px rgba(255,107,157,0.5);}
+.play-tri{width:0;height:0;border-style:solid;border-width:12px 0 12px 24px;border-color:transparent transparent transparent #fff;margin-left:5px;}
+.feat-badge{position:absolute;top:12px;left:12px;background:var(--amarelo);color:#5a3e00;font-size:10px;font-weight:800;padding:4px 10px;border-radius:20px;}
+.feat-dur{position:absolute;bottom:10px;right:10px;background:rgba(0,0,0,0.75);color:#fff;font-size:11px;font-weight:700;padding:3px 8px;border-radius:6px;}
+.featured-info{padding:16px 18px;}
+.featured-title{font-family:'Baloo 2',cursive;font-size:18px;font-weight:700;line-height:1.3;margin-bottom:12px;}
+.featured-meta{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;}
+.channel-info{display:flex;align-items:center;gap:10px;}
+.channel-avatar{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--verde),var(--azul));display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:#fff;flex-shrink:0;}
+.channel-name{font-size:13px;font-weight:700;color:#555;}
+.channel-subs{font-size:11px;color:var(--muted);}
+.view-count{font-size:12px;font-weight:700;color:var(--verde-escuro);background:#e8f8f0;padding:5px 12px;border-radius:20px;}
+
+/* AD */
+.ad-banner{margin:0 0 20px;background:linear-gradient(135deg,#fff8e1,#fdebd0);border:1.5px dashed #f0b27a;border-radius:14px;padding:14px 18px;display:flex;align-items:center;justify-content:space-between;}
+.ad-tag{font-size:9px;text-transform:uppercase;letter-spacing:1.5px;color:#e67e22;font-weight:800;margin-bottom:4px;}
+.ad-text{font-size:14px;font-weight:700;color:#7f4f00;}
+.ad-sub{font-size:12px;color:#a0691e;margin-top:2px;}
+.ad-icon{font-size:30px;}
+
+/* SECTION */
+.section{margin-bottom:28px;}
+.section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
+.section-title{font-family:'Baloo 2',cursive;font-size:18px;font-weight:700;display:flex;align-items:center;gap:6px;}
+.see-all{font-size:13px;font-weight:800;color:var(--rosa);cursor:pointer;text-decoration:none;}
+
+/* VIDEO GRID */
+.video-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;}
+.vcard{background:var(--card-bg);border-radius:14px;overflow:hidden;border:1.5px solid #f5e8ef;box-shadow:0 3px 12px rgba(0,0,0,0.05);cursor:pointer;transition:transform 0.2s,box-shadow 0.2s;position:relative;}
+.vcard:hover{transform:translateY(-3px);box-shadow:0 8px 24px rgba(255,107,157,0.18);}
+.vthumb{width:100%;aspect-ratio:16/9;position:relative;background:#eee;overflow:hidden;}
+.vthumb img{width:100%;height:100%;object-fit:cover;display:block;}
+.mini-play{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.2);}
+.mini-play-btn{width:36px;height:36px;background:rgba(255,107,157,0.9);border-radius:50%;display:flex;align-items:center;justify-content:center;}
+.mini-tri{width:0;height:0;border-style:solid;border-width:7px 0 7px 14px;border-color:transparent transparent transparent #fff;margin-left:3px;}
+.vdur{position:absolute;bottom:6px;right:7px;background:rgba(0,0,0,0.75);color:#fff;font-size:10px;font-weight:700;padding:2px 7px;border-radius:5px;}
+.vtag{position:absolute;top:7px;left:7px;font-size:9px;font-weight:800;padding:3px 8px;border-radius:10px;}
+.vtag.animal{background:#e8f8f0;color:#1e8449;}
+.vtag.bebe{background:#fff0f6;color:#c0392b;}
+.vtag.viral{background:#fff8e1;color:#e67e22;}
+.vinfo{padding:10px 12px 12px;}
+.vtitle{font-size:13px;font-weight:700;line-height:1.35;margin-bottom:7px;color:var(--text);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+.vmeta{display:flex;align-items:center;justify-content:space-between;}
+.vchannel{font-size:11px;font-weight:600;color:var(--muted);}
+.vviews{font-size:11px;font-weight:700;color:var(--verde-escuro);}
+
+/* FAV BUTTON */
+.fav-btn{position:absolute;top:7px;right:7px;width:28px;height:28px;background:rgba(255,255,255,0.9);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;cursor:pointer;border:none;z-index:2;transition:transform 0.2s;}
+.fav-btn:hover{transform:scale(1.2);}
+.fav-btn.saved{background:#ffe0ec;}
+
+/* VIEW COUNTER */
+.site-views{font-size:11px;font-weight:700;color:var(--rosa);background:var(--rosa-claro);padding:3px 10px;border-radius:20px;}
+
+/* STRIP */
+.strip{display:flex;gap:12px;overflow-x:auto;scrollbar-width:none;padding-bottom:4px;}
+.strip::-webkit-scrollbar{display:none;}
+.strip-card{flex-shrink:0;width:160px;background:var(--card-bg);border-radius:14px;overflow:hidden;border:1.5px solid #f5e8ef;box-shadow:0 2px 8px rgba(0,0,0,0.05);cursor:pointer;transition:transform 0.2s;}
+.strip-card:hover{transform:translateY(-2px);}
+.strip-thumb{width:100%;aspect-ratio:16/9;background:#eee;overflow:hidden;}
+.strip-thumb img{width:100%;height:100%;object-fit:cover;display:block;}
+.strip-info{padding:8px 10px 10px;}
+.strip-title{font-size:12px;font-weight:700;line-height:1.3;margin-bottom:4px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+.strip-views{font-size:11px;color:var(--muted);font-weight:600;}
+
+/* FOOTER */
+footer{background:#1a0a1e;color:#ccc;padding:48px 32px 24px;margin-top:20px;}
+.footer-grid{display:grid;grid-template-columns:1fr;gap:32px;max-width:1200px;margin:0 auto;}
+.footer-brand .logo{font-size:28px;display:block;margin-bottom:10px;}
+.footer-brand p{font-size:13px;line-height:1.7;color:#aaa;max-width:280px;}
+.footer-title{font-family:'Baloo 2',cursive;font-size:15px;font-weight:700;color:#fff;margin-bottom:14px;}
+.footer-links{list-style:none;}
+.footer-links li{margin-bottom:8px;}
+.footer-links a{color:#aaa;text-decoration:none;font-size:13px;font-weight:600;transition:color 0.2s;}
+.footer-links a:hover{color:var(--rosa);}
+.social-row{display:flex;gap:10px;margin-top:4px;}
+.social-btn{width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:18px;cursor:pointer;text-decoration:none;transition:transform 0.2s;}
+.social-btn:hover{transform:scale(1.1);}
+.s-yt{background:#ff000022;border:1px solid #ff000044;}
+.s-ig{background:#e1306c22;border:1px solid #e1306c44;}
+.s-tt{background:#00000033;border:1px solid #ffffff22;}
+.s-wa{background:#25d36622;border:1px solid #25d36644;}
+.footer-bottom{border-top:1px solid #333;margin-top:32px;padding-top:20px;text-align:center;font-size:12px;color:#666;max-width:1200px;margin:32px auto 0;}
+
+/* BOTTOM NAV mobile */
+.bottom-nav{position:sticky;bottom:0;background:#fff;border-top:2px solid #ffe8f0;display:flex;justify-content:space-around;padding:8px 0 12px;box-shadow:0 -4px 20px rgba(255,107,157,0.1);}
+.bnav-item{display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;padding:4px 16px;}
+.bnav-icon{font-size:20px;}
+.bnav-label{font-size:10px;font-weight:700;color:#bbb;}
+.bnav-item.active .bnav-label{color:var(--rosa);}
+
+/* MODAL VIDEO */
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:1000;align-items:center;justify-content:center;padding:20px;}
+.modal-bg.open{display:flex;}
+.modal-box{background:#fff;border-radius:20px;overflow:hidden;width:100%;max-width:480px;}
+.modal-video{width:100%;aspect-ratio:16/9;}
+.modal-video iframe{width:100%;height:100%;border:none;display:block;}
+.modal-footer{padding:14px 16px;display:flex;align-items:center;justify-content:space-between;gap:10px;}
+.modal-title{font-family:'Baloo 2',cursive;font-size:15px;font-weight:700;flex:1;}
+.modal-fav{background:var(--rosa-claro);border:none;border-radius:20px;padding:6px 14px;font-family:'Nunito',sans-serif;font-weight:800;font-size:13px;color:var(--rosa);cursor:pointer;}
+.modal-close{background:#f5f5f5;border:none;border-radius:50%;width:38px;height:38px;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+
+/* ADMIN PANEL */
+.admin-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:2000;align-items:center;justify-content:center;padding:20px;}
+.admin-overlay.open{display:flex;}
+.admin-panel{background:#fff;border-radius:20px;width:100%;max-width:560px;max-height:90vh;overflow-y:auto;}
+.admin-header{background:linear-gradient(135deg,var(--rosa),#ff9f43);padding:20px 24px;display:flex;align-items:center;justify-content:space-between;}
+.admin-header h2{font-family:'Baloo 2',cursive;font-size:20px;font-weight:800;color:#fff;}
+.admin-close{background:rgba(255,255,255,0.3);border:none;border-radius:50%;width:36px;height:36px;font-size:16px;color:#fff;cursor:pointer;}
+.admin-body{padding:24px;}
+.admin-label{font-size:12px;font-weight:800;color:#555;margin-bottom:6px;display:block;}
+.admin-input{width:100%;border:1.5px solid #f0e0e8;border-radius:12px;padding:10px 14px;font-family:'Nunito',sans-serif;font-size:14px;color:var(--text);outline:none;margin-bottom:14px;transition:border-color 0.2s;}
+.admin-input:focus{border-color:var(--rosa);}
+.admin-select{width:100%;border:1.5px solid #f0e0e8;border-radius:12px;padding:10px 14px;font-family:'Nunito',sans-serif;font-size:14px;color:var(--text);outline:none;margin-bottom:14px;background:#fff;}
+.admin-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.admin-preview{background:#fdf0f5;border-radius:12px;padding:14px;margin-bottom:16px;display:none;}
+.admin-preview img{width:100%;border-radius:8px;margin-bottom:8px;}
+.admin-preview-title{font-size:13px;font-weight:700;color:var(--text);}
+.admin-add-btn{width:100%;background:var(--rosa);color:#fff;border:none;border-radius:14px;padding:13px;font-family:'Nunito',sans-serif;font-weight:800;font-size:15px;cursor:pointer;transition:background 0.2s;}
+.admin-add-btn:hover{background:#ff4d8d;}
+.admin-divider{height:1px;background:#f0e0e8;margin:20px 0;}
+.admin-list-title{font-family:'Baloo 2',cursive;font-size:16px;font-weight:700;margin-bottom:14px;}
+.admin-video-item{display:flex;align-items:center;gap:10px;padding:10px;background:#fdf0f5;border-radius:12px;margin-bottom:8px;}
+.admin-video-thumb{width:60px;height:34px;object-fit:cover;border-radius:6px;flex-shrink:0;}
+.admin-video-info{flex:1;min-width:0;}
+.admin-video-title{font-size:12px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.admin-video-cat{font-size:10px;color:var(--rosa);font-weight:700;}
+.admin-del-btn{background:#ffe8f0;border:none;border-radius:8px;padding:5px 10px;font-size:12px;cursor:pointer;color:#c0392b;font-weight:700;flex-shrink:0;}
+
+/* FAVORITOS PANEL */
+.favs-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:2000;align-items:center;justify-content:center;padding:20px;}
+.favs-overlay.open{display:flex;}
+.favs-panel{background:#fff;border-radius:20px;width:100%;max-width:480px;max-height:85vh;overflow-y:auto;}
+.favs-header{background:linear-gradient(135deg,#ff6b9d,#c0392b);padding:20px 24px;display:flex;align-items:center;justify-content:space-between;}
+.favs-header h2{font-family:'Baloo 2',cursive;font-size:20px;font-weight:800;color:#fff;}
+.favs-close{background:rgba(255,255,255,0.3);border:none;border-radius:50%;width:36px;height:36px;font-size:16px;color:#fff;cursor:pointer;}
+.favs-body{padding:20px;}
+.favs-empty{text-align:center;padding:40px 20px;color:var(--muted);}
+.favs-empty-icon{font-size:48px;margin-bottom:12px;}
+.fav-item{display:flex;align-items:center;gap:12px;padding:10px;background:#fff0f6;border-radius:12px;margin-bottom:8px;cursor:pointer;}
+.fav-item:hover{background:#ffe0ec;}
+.fav-thumb{width:72px;height:40px;object-fit:cover;border-radius:8px;flex-shrink:0;}
+.fav-info{flex:1;min-width:0;}
+.fav-title{font-size:13px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.fav-remove{background:#ffe8f0;border:none;border-radius:8px;padding:5px 10px;font-size:12px;cursor:pointer;color:#c0392b;font-weight:700;flex-shrink:0;}
+
+/* TOAST */
+.toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#2d2d2d;color:#fff;padding:10px 20px;border-radius:30px;font-size:13px;font-weight:700;z-index:9999;opacity:0;transition:opacity 0.3s;pointer-events:none;white-space:nowrap;}
+.toast.show{opacity:1;}
+
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.vcard,.strip-card,.featured-card{animation:fadeIn 0.35s ease both;}
+
+/* RESPONSIVE */
+@media(min-width:768px){
+  .video-grid{grid-template-columns:repeat(3,1fr);}
+  .strip-card{width:190px;}
+  .footer-grid{grid-template-columns:2fr 1fr 1fr;}
+}
+@media(min-width:1024px){
+  .topbar{padding:14px 32px;}
+  .cats-wrap{padding:12px 32px 10px;}
+  .sidebar{display:block;}
+  .content{padding:24px 32px 60px;}
+  .video-grid{grid-template-columns:repeat(3,1fr);}
+  .bottom-nav{display:none;}
+  .modal-box{max-width:760px;}
+  .featured-title{font-size:20px;}
+}
+@media(min-width:1280px){
+  .video-grid{grid-template-columns:repeat(4,1fr);}
+  .strip-card{width:210px;}
+  .content{padding:28px 40px 60px;}
+}
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <div class="logo">🐾 Fofu<span>rina</span>TV</div>
+  <div class="search-bar">
+    <span style="color:var(--rosa);font-size:16px">🔍</span>
+    <input type="text" placeholder="buscar vídeos fofos..." id="searchInput" oninput="filterVideos()">
+  </div>
+  <div class="topbar-right">
+    <span class="site-views" id="siteViewsCounter">👁 0 views</span>
+    <button class="notif-btn" onclick="openFavs()">❤️</button>
+    <button class="admin-btn" onclick="openAdmin()">⚙️ Admin</button>
+  </div>
+</div>
+
+<!-- CATS -->
+<div class="cats-wrap">
+  <div class="cats">
+    <div class="cat all" onclick="filterCat('todos')">✨ Todos</div>
+    <div class="cat animais" onclick="filterCat('animais')">🐶 Animais</div>
+    <div class="cat bebes" onclick="filterCat('bebes')">👶 Bebês</div>
+    <div class="cat pets" onclick="filterCat('pets')">🐱 Pets</div>
+    <div class="cat fofura" onclick="filterCat('fofura')">💕 Fofura</div>
+    <div class="cat viral" onclick="filterCat('viral')">🔥 Viral</div>
+  </div>
+</div>
+
+<!-- PAGE BODY -->
+<div class="page-body">
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="sidebar-title">Menu</div>
+    <div class="sidebar-item active" onclick="setSidebarActive(this)"><span class="sidebar-icon">🏠</span> Início</div>
+    <div class="sidebar-item" onclick="setSidebarActive(this)"><span class="sidebar-icon">🔥</span> Em Alta</div>
+    <div class="sidebar-item" onclick="setSidebarActive(this);filterCat('animais')"><span class="sidebar-icon">🐶</span> Animais</div>
+    <div class="sidebar-item" onclick="setSidebarActive(this);filterCat('bebes')"><span class="sidebar-icon">👶</span> Bebês</div>
+    <div class="sidebar-item" onclick="setSidebarActive(this);filterCat('pets')"><span class="sidebar-icon">🐱</span> Pets</div>
+    <div class="sidebar-item" onclick="setSidebarActive(this);filterCat('fofura')"><span class="sidebar-icon">💕</span> Fofura</div>
+    <div class="sidebar-item" onclick="openFavs()"><span class="sidebar-icon">❤️</span> Salvos</div>
+    <div class="sidebar-divider"></div>
+    <div class="sidebar-title">Trending</div>
+    <div class="trend-item"><div class="trend-label">🐾 Animal</div><div class="trend-text">Leão abraça dono</div><div class="trend-views">22M views</div></div>
+    <div class="trend-item"><div class="trend-label">👶 Bebê</div><div class="trend-text">Gêmeos conversando</div><div class="trend-views">12M views</div></div>
+    <div class="trend-item"><div class="trend-label">🔥 Viral</div><div class="trend-text">Pinguim visita amigo</div><div class="trend-views">25M views</div></div>
+    <div class="trend-item" style="border-bottom:none"><div class="trend-label">🐱 Pet</div><div class="trend-text">Gatinho dorme</div><div class="trend-views">3.2M views</div></div>
+  </div>
+
+  <!-- CONTENT -->
+  <div class="content">
+    <!-- FEATURED -->
+    <div class="featured-label">⭐ Destaque do dia</div>
+    <div class="featured-card" onclick="openVideo('dQw4w9WgXcQ','Cachorrinho encontra bebê pela primeira vez 🐶👶')">
+      <div class="featured-thumb">
+        <img src="https://img.youtube.com/vi/dQw4w9WgXcQ/hqdefault.jpg" alt="destaque">
+        <div class="play-overlay"><div class="play-circle"><div class="play-tri"></div></div></div>
+        <div class="feat-badge">⭐ Em Alta</div>
+        <div class="feat-dur">3:42</div>
+      </div>
+      <div class="featured-info">
+        <div class="featured-title">Cachorrinho encontra bebê pela primeira vez 🐶👶</div>
+        <div class="featured-meta">
+          <div class="channel-info">
+            <div class="channel-avatar">AF</div>
+            <div><div class="channel-name">Amor Fofurinha</div><div class="channel-subs">2.1M inscritos</div></div>
+          </div>
+          <div class="view-count">🎥 8.4M views</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- AD 1 -->
+    <div class="ad-banner">
+      <div><div class="ad-tag">📢 Publicidade · Google AdSense</div><div class="ad-text">Pet Shop dos Sonhos</div><div class="ad-sub">Tudo para seu bichinho com 20% off!</div></div>
+      <div class="ad-icon">🛒</div>
+    </div>
+
+    <!-- ANIMAIS -->
+    <div class="section" id="sec-animais">
+      <div class="section-header"><div class="section-title">🐶 Animais Fofos</div><a class="see-all" href="#">ver todos →</a></div>
+      <div class="video-grid" id="grid-animais"></div>
+    </div>
+
+    <!-- AD 2 -->
+    <div class="ad-banner" style="background:linear-gradient(135deg,#e8f4fd,#d6eaf8);border-color:#aed6f1">
+      <div><div class="ad-tag" style="color:#0984e3">📢 Publicidade · Google AdSense</div><div class="ad-text" style="color:#1a5276">Fraldas BabyPlus</div><div class="ad-sub" style="color:#2e86c1">Conforto para seu bebê – frete grátis!</div></div>
+      <div class="ad-icon">👶</div>
+    </div>
+
+    <!-- BEBÊS -->
+    <div class="section" id="sec-bebes">
+      <div class="section-header"><div class="section-title">👶 Bebês Lindos</div><a class="see-all" href="#">ver todos →</a></div>
+      <div class="video-grid" id="grid-bebes"></div>
+    </div>
+
+    <!-- MAIS VISTOS -->
+    <div class="section">
+      <div class="section-header"><div class="section-title">🔥 Mais vistos da semana</div><a class="see-all" href="#">ver todos →</a></div>
+      <div class="strip" id="strip-mais"></div>
+    </div>
+
+    <!-- ADICIONADOS PELO ADMIN -->
+    <div class="section" id="sec-admin" style="display:none">
+      <div class="section-header"><div class="section-title">✨ Novos Vídeos</div></div>
+      <div class="video-grid" id="grid-admin"></div>
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-grid">
+    <div class="footer-brand">
+      <div class="logo" style="color:var(--rosa)">🐾 Fofu<span style="color:var(--verde)">rina</span>TV</div>
+      <p>O melhor portal de vídeos fofos de animais e bebês do Brasil. Conteúdo selecionado para alegrar o seu dia! 🐾👶</p>
+      <div class="social-row" style="margin-top:16px">
+        <a class="social-btn s-yt" href="#" title="YouTube">▶️</a>
+        <a class="social-btn s-ig" href="#" title="Instagram">📸</a>
+        <a class="social-btn s-tt" href="#" title="TikTok">🎵</a>
+        <a class="social-btn s-wa" href="#" title="WhatsApp">💬</a>
+      </div>
+    </div>
+    <div>
+      <div class="footer-title">Categorias</div>
+      <ul class="footer-links">
+        <li><a href="#" onclick="filterCat('animais')">🐶 Animais</a></li>
+        <li><a href="#" onclick="filterCat('bebes')">👶 Bebês</a></li>
+        <li><a href="#" onclick="filterCat('pets')">🐱 Pets</a></li>
+        <li><a href="#" onclick="filterCat('fofura')">💕 Fofura</a></li>
+        <li><a href="#" onclick="filterCat('viral')">🔥 Viral</a></li>
+      </ul>
+    </div>
+    <div>
+      <div class="footer-title">Informações</div>
+      <ul class="footer-links">
+        <li><a href="#">Sobre nós</a></li>
+        <li><a href="#">Anuncie aqui</a></li>
+        <li><a href="#">Política de privacidade</a></li>
+        <li><a href="#">Termos de uso</a></li>
+        <li><a href="#">Contato</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p>© 2025 FofurinaTV · Todos os vídeos são de propriedade de seus respectivos canais no YouTube · Feito com ❤️ no Brasil</p>
+  </div>
+</footer>
+
+<!-- BOTTOM NAV -->
+<div class="bottom-nav">
+  <div class="bnav-item active"><div class="bnav-icon">🏠</div><div class="bnav-label active">início</div></div>
+  <div class="bnav-item" onclick="document.getElementById('searchInput').focus()"><div class="bnav-icon">🔍</div><div class="bnav-label">buscar</div></div>
+  <div class="bnav-item" onclick="openFavs()"><div class="bnav-icon">❤️</div><div class="bnav-label">salvos</div></div>
+  <div class="bnav-item" onclick="openAdmin()"><div class="bnav-icon">⚙️</div><div class="bnav-label">admin</div></div>
+</div>
+
+<!-- MODAL VIDEO -->
+<div class="modal-bg" id="modal" onclick="closeModal(event)">
+  <div class="modal-box">
+    <div class="modal-video"><iframe id="modal-iframe" src="" allowfullscreen allow="autoplay;encrypted-media"></iframe></div>
+    <div class="modal-footer">
+      <div class="modal-title" id="modal-title"></div>
+      <button class="modal-fav" onclick="favCurrentVideo()">❤️ Salvar</button>
+      <button class="modal-close" onclick="closeVideo()">✕</button>
+    </div>
+  </div>
+</div>
+
+<!-- ADMIN PANEL -->
+<div class="admin-overlay" id="adminOverlay" onclick="closeAdminOutside(event)">
+  <div class="admin-panel">
+    <div class="admin-header">
+      <h2>⚙️ Painel Admin</h2>
+      <button class="admin-close" onclick="closeAdmin()">✕</button>
+    </div>
+    <div class="admin-body">
+      <label class="admin-label">Link ou ID do YouTube</label>
+      <input class="admin-input" id="adminUrl" placeholder="Ex: https://youtube.com/watch?v=abc123 ou só o ID" oninput="previewVideo()">
+      <div class="admin-preview" id="adminPreview">
+        <img id="adminThumb" src="" alt="preview">
+        <div class="admin-preview-title" id="adminPreviewTitle">Pré-visualização</div>
+      </div>
+      <label class="admin-label">Título do vídeo</label>
+      <input class="admin-input" id="adminTitle" placeholder="Ex: Gatinho fofo dormindo 😻">
+      <div class="admin-row">
+        <div>
+          <label class="admin-label">Categoria</label>
+          <select class="admin-select" id="adminCat">
+            <option value="animais">🐶 Animais</option>
+            <option value="bebes">👶 Bebês</option>
+            <option value="pets">🐱 Pets</option>
+            <option value="fofura">💕 Fofura</option>
+            <option value="viral">🔥 Viral</option>
+          </select>
+        </div>
+        <div>
+          <label class="admin-label">Duração</label>
+          <input class="admin-input" id="adminDur" placeholder="Ex: 2:34">
+        </div>
+      </div>
+      <button class="admin-add-btn" onclick="addVideo()">✅ Adicionar Vídeo ao Site</button>
+      <div class="admin-divider"></div>
+      <div class="admin-list-title">📋 Vídeos adicionados</div>
+      <div id="adminVideoList"><div style="font-size:13px;color:var(--muted);text-align:center;padding:20px">Nenhum vídeo adicionado ainda</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- FAVORITOS PANEL -->
+<div class="favs-overlay" id="favsOverlay" onclick="closeFavsOutside(event)">
+  <div class="favs-panel">
+    <div class="favs-header">
+      <h2>❤️ Meus Salvos</h2>
+      <button class="favs-close" onclick="closeFavs()">✕</button>
+    </div>
+    <div class="favs-body" id="favsBody"></div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ============ DATA ============
+const defaultVideos = {
+  animais: [
+    {id:'SkgTxQm9DWM',title:'Gatinho aprende a andar e cai dormindo',channel:'PetMundo',views:'3.2M',dur:'1:24',tag:'animal'},
+    {id:'YCaGYUIfdy4',title:'Cachorro salva tartaruga presa nas pedras',channel:'NaturezaViva',views:'5.7M',dur:'2:08',tag:'viral'},
+    {id:'GtL1huin9EE',title:'Patinho segue bebê pela casa inteira 😂',channel:'Momentos Raros',views:'1.9M',dur:'0:58',tag:'animal'},
+    {id:'NUYvbT6vTPs',title:'Leão reconhece dono após anos separados',channel:'AfricaWild',views:'22M',dur:'4:15',tag:'viral'},
+    {id:'JN9yGxKjbmo',title:'Orangotango adota filhote de tigre abandonado',channel:'WildLife',views:'18M',dur:'5:30',tag:'animal'},
+    {id:'BhQpNHMSxvE',title:'Pinguim viaja todo ano para visitar amigo humano',channel:'PureNature',views:'25M',dur:'6:12',tag:'viral'},
+    {id:'PKffm2uI4dk',title:'Cachorro e bebê tiram soneca juntos',channel:'FamíliaFofa',views:'7.5M',dur:'1:05',tag:'animal'},
+    {id:'qeMFqkcPYcg',title:'Bebê e cachorro inseparáveis desde o dia 1',channel:'PureJoy',views:'6.8M',dur:'2:20',tag:'animal'},
+  ],
+  bebes: [
+    {id:'fHEYFKJpnCk',title:'Bebê ri pela primeira vez com papai',channel:'FamíliaSorriso',views:'4.1M',dur:'0:47',tag:'bebe'},
+    {id:'0Bmhjf0rKe8',title:'Gêmeos bebês tendo conversa séria 😂',channel:'MomLife',views:'12M',dur:'1:32',tag:'viral'},
+    {id:'L4X7AO8n9c0',title:'Bebê prova limão pela primeira vez 😂😂',channel:'BabyFunny',views:'9.3M',dur:'0:35',tag:'viral'},
+    {id:'dYVMGY2bAk0',title:'Bebê de 1 ano toca violão e encanta a todos',channel:'BabyTalent',views:'4.2M',dur:'2:14',tag:'bebe'},
+  ]
+};
+
+let customVideos = JSON.parse(localStorage.getItem('fofurina_videos') || '[]');
+let favorites = JSON.parse(localStorage.getItem('fofurina_favs') || '[]');
+let siteViews = parseInt(localStorage.getItem('fofurina_views') || '0');
+let currentVideoId = '';
+let currentVideoTitle = '';
+
+// ============ INIT ============
+function init() {
+  siteViews++;
+  localStorage.setItem('fofurina_views', siteViews);
+  updateViewCounter();
+  renderGrid('grid-animais', defaultVideos.animais);
+  renderGrid('grid-bebes', defaultVideos.bebes);
+  renderStrip();
+  renderAdminList();
+  renderCustomVideos();
+}
+
+function updateViewCounter() {
+  const el = document.getElementById('siteViewsCounter');
+  if (el) el.textContent = '👁 ' + formatViews(siteViews) + ' views';
+}
+
+function formatViews(n) {
+  if (n >= 1000000) return (n/1000000).toFixed(1) + 'M';
+  if (n >= 1000) return (n/1000).toFixed(1) + 'K';
+  return n.toString();
+}
+
+// ============ RENDER ============
+function makeCard(v) {
+  const isFav = favorites.some(f => f.id === v.id);
+  const tagClass = v.tag === 'viral' ? 'viral' : v.tag === 'bebe' ? 'bebe' : 'animal';
+  const tagEmoji = v.tag === 'viral' ? '🔥 Viral' : v.tag === 'bebe' ? '👶 Bebê' : '🐾 Animal';
+  return `<div class="vcard" onclick="openVideo('${v.id}','${v.title.replace(/'/g,"\\'")}')">
+    <div class="vthumb">
+      <img src="https://img.youtube.com/vi/${v.id}/mqdefault.jpg" alt="" loading="lazy">
+      <div class="mini-play"><div class="mini-play-btn"><div class="mini-tri"></div></div></div>
+      <div class="vtag ${tagClass}">${tagEmoji}</div>
+      <div class="vdur">${v.dur||''}</div>
+    </div>
+    <button class="fav-btn ${isFav?'saved':''}" onclick="event.stopPropagation();toggleFav('${v.id}','${v.title.replace(/'/g,"\\'")}',this)" title="${isFav?'Remover dos salvos':'Salvar'}">${isFav?'❤️':'🤍'}</button>
+    <div class="vinfo">
+      <div class="vtitle">${v.title}</div>
+      <div class="vmeta"><span class="vchannel">${v.channel||''}</span><span class="vviews">${v.views||''} views</span></div>
+    </div>
+  </div>`;
+}
+
+function renderGrid(gridId, videos) {
+  const el = document.getElementById(gridId);
+  if (el) el.innerHTML = videos.map(makeCard).join('');
+}
+
+function renderStrip() {
+  const all = [...defaultVideos.animais, ...defaultVideos.bebes].sort(() => Math.random()-0.5).slice(0,8);
+  const el = document.getElementById('strip-mais');
+  if (!el) return;
+  el.innerHTML = all.map(v => `<div class="strip-card" onclick="openVideo('${v.id}','${v.title.replace(/'/g,"\\'")}')">
+    <div class="strip-thumb"><img src="https://img.youtube.com/vi/${v.id}/mqdefault.jpg" alt="" loading="lazy"></div>
+    <div class="strip-info"><div class="strip-title">${v.title}</div><div class="strip-views">🎥 ${v.views} views</div></div>
+  </div>`).join('');
+}
+
+function renderCustomVideos() {
+  const el = document.getElementById('grid-admin');
+  const sec = document.getElementById('sec-admin');
+  if (!el || !sec) return;
+  if (customVideos.length === 0) { sec.style.display='none'; return; }
+  sec.style.display='block';
+  el.innerHTML = customVideos.map(makeCard).join('');
+}
+
+function renderAdminList() {
+  const el = document.getElementById('adminVideoList');
+  if (!el) return;
+  if (customVideos.length === 0) {
+    el.innerHTML = '<div style="font-size:13px;color:var(--muted);text-align:center;padding:20px">Nenhum vídeo adicionado ainda</div>';
+    return;
+  }
+  el.innerHTML = customVideos.map((v,i) => `<div class="admin-video-item">
+    <img class="admin-video-thumb" src="https://img.youtube.com/vi/${v.id}/mqdefault.jpg" alt="">
+    <div class="admin-video-info"><div class="admin-video-title">${v.title}</div><div class="admin-video-cat">${v.cat||v.tag}</div></div>
+    <button class="admin-del-btn" onclick="deleteVideo(${i})">🗑 Apagar</button>
+  </div>`).join('');
+}
+
+// ============ VIDEO PLAYER ============
+function openVideo(id, title) {
+  currentVideoId = id;
+  currentVideoTitle = title;
+  document.getElementById('modal-iframe').src = 'https://www.youtube.com/embed/' + id + '?autoplay=1';
+  document.getElementById('modal-title').textContent = title;
+  document.getElementById('modal').classList.add('open');
+  const favBtn = document.querySelector('.modal-fav');
+  if (favBtn) favBtn.textContent = favorites.some(f=>f.id===id) ? '❤️ Salvo!' : '❤️ Salvar';
+}
+function closeVideo() {
+  document.getElementById('modal-iframe').src = '';
+  document.getElementById('modal').classList.remove('open');
+}
+function closeModal(e) { if(e.target===document.getElementById('modal')) closeVideo(); }
+
+// ============ FAVORITES ============
+function toggleFav(id, title, btn) {
+  const idx = favorites.findIndex(f=>f.id===id);
+  if (idx === -1) {
+    favorites.push({id, title});
+    btn.textContent = '❤️'; btn.classList.add('saved');
+    showToast('❤️ Adicionado aos salvos!');
+  } else {
+    favorites.splice(idx,1);
+    btn.textContent = '🤍'; btn.classList.remove('saved');
+    showToast('💔 Removido dos salvos');
+  }
+  localStorage.setItem('fofurina_favs', JSON.stringify(favorites));
+  const mfav = document.querySelector('.modal-fav');
+  if (mfav && currentVideoId===id) mfav.textContent = favorites.some(f=>f.id===id)?'❤️ Salvo!':'❤️ Salvar';
+}
+
+function favCurrentVideo() {
+  if (!currentVideoId) return;
+  const idx = favorites.findIndex(f=>f.id===currentVideoId);
+  if (idx===-1) {
+    favorites.push({id:currentVideoId, title:currentVideoTitle});
+    document.querySelector('.modal-fav').textContent='❤️ Salvo!';
+    showToast('❤️ Adicionado aos salvos!');
+  } else {
+    favorites.splice(idx,1);
+    document.querySelector('.modal-fav').textContent='❤️ Salvar';
+    showToast('💔 Removido dos salvos');
+  }
+  localStorage.setItem('fofurina_favs', JSON.stringify(favorites));
+  document.querySelectorAll('.fav-btn').forEach(btn => {
+    const card = btn.closest('.vcard');
+    if (card && card.getAttribute('onclick') && card.getAttribute('onclick').includes(currentVideoId)) {
+      const isFav = favorites.some(f=>f.id===currentVideoId);
+      btn.textContent = isFav?'❤️':'🤍';
+      isFav?btn.classList.add('saved'):btn.classList.remove('saved');
+    }
+  });
+}
+
+function openFavs() {
+  const body = document.getElementById('favsBody');
+  if (favorites.length===0) {
+    body.innerHTML='<div class="favs-empty"><div class="favs-empty-icon">🤍</div><div style="font-size:15px;font-weight:700;margin-bottom:6px">Nenhum vídeo salvo ainda</div><div style="font-size:13px;color:var(--muted)">Clique no 🤍 nos vídeos para salvar!</div></div>';
+  } else {
+    body.innerHTML = favorites.map((v,i)=>`<div class="fav-item" onclick="closeFavs();openVideo('${v.id}','${v.title.replace(/'/g,"\\'")}')">
+      <img class="fav-thumb" src="https://img.youtube.com/vi/${v.id}/mqdefault.jpg" alt="">
+      <div class="fav-info"><div class="fav-title">${v.title}</div></div>
+      <button class="fav-remove" onclick="event.stopPropagation();removeFav(${i})">✕</button>
+    </div>`).join('');
+  }
+  document.getElementById('favsOverlay').classList.add('open');
+}
+function closeFavs() { document.getElementById('favsOverlay').classList.remove('open'); }
+function closeFavsOutside(e) { if(e.target===document.getElementById('favsOverlay')) closeFavs(); }
+function removeFav(i) {
+  favorites.splice(i,1);
+  localStorage.setItem('fofurina_favs',JSON.stringify(favorites));
+  openFavs();
+  showToast('💔 Removido dos salvos');
+}
+
+// ============ ADMIN ============
+function extractYTId(input) {
+  input = input.trim();
+  const match = input.match(/[?&]v=([^&]+)/) || input.match(/youtu\.be\/([^?]+)/) || input.match(/embed\/([^?]+)/);
+  if (match) return match[1];
+  if (/^[a-zA-Z0-9_-]{11}$/.test(input)) return input;
+  return null;
+}
+
+function previewVideo() {
+  const input = document.getElementById('adminUrl').value;
+  const id = extractYTId(input);
+  const preview = document.getElementById('adminPreview');
+  if (id) {
+    document.getElementById('adminThumb').src = `https://img.youtube.com/vi/${id}/mqdefault.jpg`;
+    document.getElementById('adminPreviewTitle').textContent = 'ID: ' + id;
+    preview.style.display='block';
+  } else {
+    preview.style.display='none';
+  }
+}
+
+function addVideo() {
+  const url = document.getElementById('adminUrl').value;
+  const title = document.getElementById('adminTitle').value.trim();
+  const cat = document.getElementById('adminCat').value;
+  const dur = document.getElementById('adminDur').value.trim();
+  const id = extractYTId(url);
+  if (!id) { showToast('❌ Link ou ID inválido!'); return; }
+  if (!title) { showToast('❌ Coloque um título!'); return; }
+  const catEmojis = {animais:'🐶',bebes:'👶',pets:'🐱',fofura:'💕',viral:'🔥'};
+  const tagMap = {animais:'animal',bebes:'bebe',pets:'animal',fofura:'bebe',viral:'viral'};
+  const newVideo = {id, title, channel:'Canal Adicionado', views:'Novo', dur: dur||'—', tag:tagMap[cat]||'animal', cat};
+  customVideos.unshift(newVideo);
+  localStorage.setItem('fofurina_videos', JSON.stringify(customVideos));
+  document.getElementById('adminUrl').value='';
+  document.getElementById('adminTitle').value='';
+  document.getElementById('adminDur').value='';
+  document.getElementById('adminPreview').style.display='none';
+  renderAdminList();
+  renderCustomVideos();
+  showToast('✅ Vídeo adicionado com sucesso!');
+}
+
+function deleteVideo(i) {
+  customVideos.splice(i,1);
+  localStorage.setItem('fofurina_videos',JSON.stringify(customVideos));
+  renderAdminList();
+  renderCustomVideos();
+  showToast('🗑 Vídeo removido');
+}
+
+function openAdmin() { document.getElementById('adminOverlay').classList.add('open'); }
+function closeAdmin() { document.getElementById('adminOverlay').classList.remove('open'); }
+function closeAdminOutside(e) { if(e.target===document.getElementById('adminOverlay')) closeAdmin(); }
+
+// ============ FILTER ============
+function filterCat(cat) {
+  document.querySelectorAll('.cat').forEach(c=>c.style.opacity='0.5');
+  const secAnimais = document.getElementById('sec-animais');
+  const secBebes = document.getElementById('sec-bebes');
+  if (cat==='todos') {
+    secAnimais.style.display=''; secBebes.style.display='';
+    document.querySelectorAll('.cat').forEach(c=>c.style.opacity='1');
+    renderGrid('grid-animais',defaultVideos.animais);
+    renderGrid('grid-bebes',defaultVideos.bebes);
+  } else if (cat==='animais'||cat==='pets') {
+    secAnimais.style.display=''; secBebes.style.display='none';
+    renderGrid('grid-animais',defaultVideos.animais);
+  } else if (cat==='bebes'||cat==='fofura') {
+    secAnimais.style.display='none'; secBebes.style.display='';
+    renderGrid('grid-bebes',defaultVideos.bebes);
+  } else if (cat==='viral') {
+    const viral = [...defaultVideos.animais,...defaultVideos.bebes].filter(v=>v.tag==='viral');
+    secAnimais.style.display=''; secBebes.style.display='none';
+    document.getElementById('sec-animais').querySelector('.section-title').innerHTML='🔥 Vídeos Virais';
+    renderGrid('grid-animais',viral);
+  }
+}
+
+function filterVideos() {
+  const q = document.getElementById('searchInput').value.toLowerCase();
+  if (!q) { renderGrid('grid-animais',defaultVideos.animais); renderGrid('grid-bebes',defaultVideos.bebes); return; }
+  const all = [...defaultVideos.animais,...defaultVideos.bebes,...customVideos];
+  const found = all.filter(v=>v.title.toLowerCase().includes(q)||v.channel.toLowerCase().includes(q));
+  document.getElementById('sec-animais').querySelector('.section-title').innerHTML='🔍 Resultados';
+  document.getElementById('sec-bebes').style.display='none';
+  renderGrid('grid-animais',found);
+}
+
+// ============ SIDEBAR ============
+function setSidebarActive(el) {
+  document.querySelectorAll('.sidebar-item').forEach(x=>x.classList.remove('active'));
+  el.classList.add('active');
+}
+
+// ============ TOAST ============
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent=msg; t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2500);
+}
+
+init();
+</script>
+</body>
+</html>
